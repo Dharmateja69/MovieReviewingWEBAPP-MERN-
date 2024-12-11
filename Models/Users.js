@@ -36,4 +36,10 @@ Userschema.pre("save",async function(next)//we can use this method to hash not o
     }
     next();
 })
+//11-12-2024(7:13)
+Userschema.methods.comparePassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
+  };
+
+
  module.exports = mongoose.model("User",Userschema);
