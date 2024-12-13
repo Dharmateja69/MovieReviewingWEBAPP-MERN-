@@ -1,5 +1,7 @@
 const User = require('../Models/Users');
 const Emailtoken = require("../Models/EmailVerificationToken");
+//12:12:27
+const jwt = require("jsonwebtoken");
 
 const nodemailer = require("nodemailer");
 const { isValidObjectId } = require('mongoose');
@@ -188,3 +190,42 @@ exports.resetPassword = async (req, res) => {
     res.json({ message: 'Password Reset Successfull, now you can use new password ' })
 
 };
+//12-12-24
+exports.signin = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+  
+      // Validate inputs
+      if (!email || !password) {
+        return senderror(res, 'Email and password are required!');
+      }
+  
+      // Find user by email
+      const user = await User.findOne({ email });
+      if (!user) return senderror(res, 'Email/Password mismatch!');
+  
+      // Compare password
+      const matched = await user.comparePassword(password); // Ensure comparePassword is defined in the User model
+      if (!matched) return senderror(res, 'Email/Password mismatch!');
+  
+      // Generate JWT token
+      const jwtToken = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET || 'shdjsbvxhbvjhcvjb23', // Use an environment variable for the secret key
+        { expiresIn: '1h' } // Optional: Add token expiration
+      );
+  
+      // Send response
+      res.json({
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          token: jwtToken,
+        },
+      });
+    } catch (err) {
+      console.error('Signin Error:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };

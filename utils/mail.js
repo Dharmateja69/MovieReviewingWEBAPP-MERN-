@@ -16,9 +16,10 @@ exports.generateEmailotp= () => {
         host: "sandbox.smtp.mailtrap.io",
         port: 2525,
         auth: {
-            user: "b0a9a6b4f8ad87",
-            pass: "55c60297b2a346"
-        }
+            //12-12-24
+            user: process.env.MAIL_TRAP_user,
+            pass: process.env.MAIL_TRAP_pass,
+        },
     });
 return transporter;
     // You can use the transporter to send an email, e.g.

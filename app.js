@@ -1,9 +1,22 @@
 const Express = require("express");
+//12-12-24
+const Morgan = require("morgan");
+require("dotenv").config()
+//13-12-24
+require('express-async-errors');
+
 const Userroute = require("./Routes/User");
+const { errorHandler } = require("./Middelwares/error");
  require("./Db");
 const app = Express();
 app.use(Express.json()); //used to convert the chunks to json fromat wch are comming from font end to backend
+app.use(Morgan("dev"));
 app.use("/api/user", Userroute); //where /api/user is an argument type used as prefix for /api/user/create (Routes>user.js);
+
+//13-12-24
+app.use(errorHandler)
+
+
 app.get("/", (req, res) => {
   res.send("<h1>this is the main home page !!</h1>");
 });

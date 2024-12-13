@@ -5,9 +5,10 @@ const {
     resendEmailVerficationToken,
     forgetPassword,
     resetPassword,
-    sendResetPasswordTokenStatus
+    sendResetPasswordTokenStatus,
+    signin
 } = require("../Controller/ConUsers");
-const { UserValidator, validate, validatorPassword } = require("../Middelwares/validator");
+const { UserValidator, validate, validatorPassword, Siginvalidator } = require("../Middelwares/validator");
 const { isValidPassResetToken } = require("../Middelwares/user");
 
 const Router = express.Router();
@@ -21,4 +22,6 @@ Router.post("/forget-password", forgetPassword);
 Router.post("/verify-pass-reset-token", isValidPassResetToken, sendResetPasswordTokenStatus);
 //11-12-2024(7:13)
 Router.post("/reset-password", validatorPassword, validate, isValidPassResetToken, resetPassword);
+//12-12-24
+Router.post("/signin", Siginvalidator, validate, signin);
 module.exports = Router;
