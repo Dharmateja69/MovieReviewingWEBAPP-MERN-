@@ -38,7 +38,11 @@ exports.createcon = async (req, res) => {
         html: `please verify this ${OTP}!`
     })
 
-    res.status(201).json({ message: 'please verify your email. otp has been sent to your email!!' });
+    res.status(201).json({ user:{
+        id:newUser._id,
+        name:newUser.name,
+        email: newUser.email,
+    }});
 };
 //7 th concept in email otp verification
 exports.VerifyEmail = async (req, res) => {
