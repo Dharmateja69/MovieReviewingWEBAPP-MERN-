@@ -7,14 +7,15 @@ require('express-async-errors');
 
 const Userroute = require("./Routes/User");
 const { errorHandler } = require("./Middelwares/error");
-const cors = require("cors")
+const cors = require("cors");
+const { handleNotFOund } = require("./utils/helper");
  require("./Db");
 const app = Express();
 app.use(cors())
 app.use(Express.json()); //used to convert the chunks to json fromat wch are comming from font end to backend
 app.use(Morgan("dev"));
 app.use("/api/user", Userroute); //where /api/user is an argument type used as prefix for /api/user/create (Routes>user.js);
-
+app.use('/*',handleNotFOund)
 //13-12-24
 app.use(errorHandler)
 
