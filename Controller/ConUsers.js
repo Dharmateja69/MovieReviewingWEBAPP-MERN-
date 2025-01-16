@@ -38,11 +38,13 @@ exports.createcon = async (req, res) => {
         html: `please verify this ${OTP}!`
     })
 
-    res.status(201).json({ user:{
-        id:newUser._id,
-        name:newUser.name,
-        email: newUser.email,
-    }});
+    res.status(201).json({
+        user: {
+            id: newUser._id,
+            name: newUser.name,
+            email: newUser.email,
+        }
+    });
 };
 //7 th concept in email otp verification
 exports.VerifyEmail = async (req, res) => {
@@ -89,8 +91,14 @@ exports.VerifyEmail = async (req, res) => {
 
 
 
+    // Generate JWT token
+    const jwtToken = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET || 'shdjsbvxhbvjhcvjb23', // Use an environment variable for the secret key
+        { expiresIn: '1h' } // Optional: Add token expiration
+    );
 
-    res.json({ message: "your email is verified." })//will go to frontend
+    res.json({ user: { id: user._id, name: user.name, email: user.email, token: jwtToken }, message: "your email is verified." })//will go to frontend
 };
 
 exports.resendEmailVerficationToken = async (req, res) => {
@@ -197,39 +205,39 @@ exports.resetPassword = async (req, res) => {
 //12-12-24
 exports.signin = async (req, res) => {
     try {
-      const { email, password } = req.body;
-  
-      // Validate inputs
-      if (!email || !password) {
-        return senderror(res, 'Email and password are required!');
-      }
-  
-      // Find user by email
-      const user = await User.findOne({ email });
-      if (!user) return senderror(res, 'Email/Password mismatch!');
-  
-      // Compare password
-      const matched = await user.comparePassword(password); // Ensure comparePassword is defined in the User model
-      if (!matched) return senderror(res, 'Email/Password mismatch!');
-  
-      // Generate JWT token
-      const jwtToken = jwt.sign(
-        { userId: user._id },
-        process.env.JWT_SECRET || 'shdjsbvxhbvjhcvjb23', // Use an environment variable for the secret key
-        { expiresIn: '1h' } // Optional: Add token expiration
-      );
-  
-      // Send response
-      res.json({
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          token: jwtToken,
-        },
-      });
+        const { email, password } = req.body;
+
+        // Validate inputs
+        if (!email || !password) {
+            return senderror(res, 'Email and password are required!');
+        }
+
+        // Find user by email
+        const user = await User.findOne({ email });
+        if (!user) return senderror(res, 'Email/Password mismatch!');
+
+        // Compare password
+        const matched = await user.comparePassword(password); // Ensure comparePassword is defined in the User model
+        if (!matched) return senderror(res, 'Email/Password mismatch!');
+
+        // Generate JWT token
+        const jwtToken = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET || 'shdjsbvxhbvjhcvjb23', // Use an environment variable for the secret key
+            { expiresIn: '1h' } // Optional: Add token expiration
+        );
+
+        // Send response
+        res.json({
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                token: jwtToken,
+            },
+        });
     } catch (err) {
-      console.error('Signin Error:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Signin Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-  };
+};
