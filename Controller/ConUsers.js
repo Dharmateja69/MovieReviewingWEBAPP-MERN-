@@ -98,7 +98,10 @@ exports.VerifyEmail = async (req, res) => {
         { expiresIn: '1h' } // Optional: Add token expiration
     );
 
-    res.json({ user: { id: user._id, name: user.name, email: user.email, token: jwtToken }, message: "your email is verified." })//will go to frontend
+    res.json({
+        user: { id: user._id, name: user.name, email: user.email, token: jwtToken, isVerified: user.isVerified },
+        message: "your email is verified."
+    })//will go to frontend
 };
 
 exports.resendEmailVerficationToken = async (req, res) => {
@@ -184,7 +187,7 @@ exports.resetPassword = async (req, res) => {
     const matched = await user.comparePassword(newPassword)
     if (matched) return senderror(res, 'The new password must be different from the old one !');
 
-    User.password = newPassword;
+    user.password = newPassword;
 
     await user.save();
 
@@ -224,20 +227,22 @@ exports.signin = async (req, res) => {
         const jwtToken = jwt.sign(
             { userId: user._id },
             process.env.JWT_SECRET || 'shdjsbvxhbvjhcvjb23', // Use an environment variable for the secret key
-            { expiresIn: '1h' } // Optional: Add token expiration
+            { expiresIn: '1hr' } // Optional: Add token expiration
         );
+        const { _id, name, isVerified } = user
 
         // Send response
         res.json({
             user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
+                id: _id,
+                name: name,
+                email: email,
                 token: jwtToken,
+                isVerified
             },
         });
     } catch (err) {
         console.error('Signin Error:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Internal Server Error ' });
     }
 };
